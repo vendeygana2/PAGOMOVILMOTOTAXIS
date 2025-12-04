@@ -554,7 +554,7 @@
             background-color: white;
             border-radius: 15px;
             width: 90%;
-            max-width: 400px;
+            max-width: 500px;
             padding: 40px 30px;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
             transform: translateY(30px) scale(0.9);
@@ -568,7 +568,7 @@
         
         .popup-icon {
             font-size: 4rem;
-            color: #4caf50;
+            color: #25D366;
             margin-bottom: 20px;
             animation: pulse 1.5s infinite;
         }
@@ -583,7 +583,18 @@
             color: #333;
             font-size: 1.2rem;
             line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .popup-submessage {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.4;
             margin-bottom: 25px;
+            background-color: #f9f9f9;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #25D366;
         }
         
         .popup-close-btn {
@@ -600,11 +611,49 @@
             justify-content: center;
             gap: 10px;
             transition: all 0.3s ease;
+            margin-bottom: 15px;
         }
         
         .popup-close-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(26, 58, 143, 0.3);
+        }
+        
+        .whatsapp-btn {
+            background: linear-gradient(to right, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 10px;
+        }
+        
+        .whatsapp-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+            background: linear-gradient(to right, #1da851, #0d7d6f);
+        }
+        
+        .whatsapp-btn i {
+            font-size: 1.4rem;
+        }
+        
+        .whatsapp-info {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            font-style: italic;
         }
         
         @keyframes spin {
@@ -673,6 +722,15 @@
             }
             
             .popup-message {
+                font-size: 1rem;
+            }
+            
+            .popup-submessage {
+                font-size: 0.9rem;
+            }
+            
+            .whatsapp-btn {
+                padding: 12px 20px;
                 font-size: 1rem;
             }
         }
@@ -848,14 +906,21 @@
     <div class="popup-overlay" id="thankYouPopup">
         <div class="popup">
             <div class="popup-icon">
-                <i class="fas fa-motorcycle"></i>
+                <i class="fab fa-whatsapp"></i>
             </div>
             <div class="popup-title">
                 ¡Muchas Gracias!
             </div>
             <div class="popup-message">
-                Gracias por usar nuestra línea de mototaxis Simón Bolívar
+                Gracias por usar nuestra línea de mototaxis "FRENTE DE MARCHA"
             </div>
+            <div class="popup-submessage">
+                Por favor, envía el capture de tu pago al siguiente WhatsApp
+            </div>
+            <a href="https://wa.me/584120754787" target="_blank" class="whatsapp-btn">
+                <i class="fab fa-whatsapp"></i> Enviar a WhatsApp
+            </a>
+            <p class="whatsapp-info">Al hacer clic, se abrirá WhatsApp con nuestro número</p>
             <button class="popup-close-btn" id="closePopupBtn">
                 <i class="fas fa-check"></i> Cerrar
             </button>
@@ -890,6 +955,7 @@
             // Elementos del popup de agradecimiento
             const thankYouPopup = document.getElementById('thankYouPopup');
             const closePopupBtn = document.getElementById('closePopupBtn');
+            const whatsappBtn = document.querySelector('.whatsapp-btn');
             
             // Valor REAL del dólar según la imagen proporcionada
             const REAL_DOLAR_BCV = "251,88670000";
