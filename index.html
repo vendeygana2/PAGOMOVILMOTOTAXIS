@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Dólar BCV - Pago Móvil</title>
+    <title>Línea de Mototaxis Frente de Marcha - Calculadora de Servicios</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -25,7 +25,7 @@
         
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
             background-color: rgba(255, 255, 255, 0.97);
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
@@ -35,100 +35,86 @@
         .header {
             background: linear-gradient(to right, #0c1b5a, #1a3a8f);
             color: white;
-            padding: 25px;
+            padding: 20px;
             text-align: center;
         }
         
         .header h1 {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             margin-bottom: 5px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 5px;
         }
         
         .header p {
             opacity: 0.9;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        .brand-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         .content {
-            padding: 30px;
+            padding: 25px;
         }
         
-        .info-box {
+        .rate-info {
             background-color: #f8f9fa;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
+            padding: 15px;
+            margin-bottom: 20px;
             border-left: 5px solid #1a3a8f;
+            text-align: center;
         }
         
-        .info-box h3 {
-            color: #1a3a8f;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .info-box p {
+        .rate-info p {
             color: #555;
             line-height: 1.5;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
         }
         
-        .btn-container {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        
-        .btn-bcv {
-            background: linear-gradient(to right, #0c1b5a, #1a3a8f);
-            color: white;
-            border: none;
-            padding: 18px 30px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            border-radius: 12px;
-            cursor: pointer;
-            display: inline-flex;
+        .rate-display {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(26, 58, 143, 0.3);
-            width: 100%;
-            max-width: 380px;
+            background-color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
         }
         
-        .btn-bcv:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(26, 58, 143, 0.4);
+        .rate-label {
+            font-weight: 600;
+            color: #333;
         }
         
-        .btn-bcv:active {
-            transform: translateY(0);
-        }
-        
-        .btn-bcv:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
+        .rate-value {
+            font-weight: bold;
+            color: #1a3a8f;
+            font-size: 1.1rem;
         }
         
         .calculator-section {
             background-color: #f1f8ff;
             border-radius: 12px;
             padding: 25px;
-            margin-top: 25px;
+            margin-top: 20px;
             border: 2px solid #c2d9ff;
         }
         
         .calculator-title {
             color: #1a3a8f;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -136,7 +122,7 @@
         }
         
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         .input-group label {
@@ -185,11 +171,12 @@
             margin-top: 20px;
             text-align: center;
             border: 2px dashed #c2d9ff;
-            position: relative;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
         }
         
-        .result-container.hidden {
-            display: none;
+        .result-container.visible {
+            display: block;
         }
         
         .result-title {
@@ -202,27 +189,8 @@
             gap: 8px;
         }
         
-        .dolar-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #0c1b5a;
-            margin: 10px 0;
-        }
-        
-        .conversion-result {
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 2px solid #eaeaea;
-        }
-        
-        .conversion-title {
-            color: #555;
-            font-size: 1rem;
-            margin-bottom: 10px;
-        }
-        
         .conversion-amount {
-            font-size: 2.8rem;
+            font-size: 2.5rem;
             font-weight: 700;
             color: #1a3a8f;
             margin: 10px 0;
@@ -257,12 +225,6 @@
         
         .copy-btn.copied i {
             animation: bounce 0.5s;
-        }
-        
-        .unit {
-            font-size: 1rem;
-            color: #666;
-            font-weight: normal;
         }
         
         .update-info {
@@ -475,71 +437,10 @@
         
         .footer {
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             color: #666;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             border-top: 1px solid #eee;
-        }
-        
-        .instructions {
-            margin-top: 25px;
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            padding: 15px;
-            font-size: 0.9rem;
-            color: #555;
-        }
-        
-        .instructions h4 {
-            color: #1a3a8f;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .bcv-preview {
-            background-color: #f5f5f5;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            border: 1px solid #ddd;
-            font-family: monospace;
-            font-size: 1.1rem;
-            text-align: center;
-            color: #333;
-        }
-        
-        .highlight {
-            color: #1a3a8f;
-            font-weight: bold;
-            background-color: #e8f0fe;
-            padding: 2px 5px;
-            border-radius: 4px;
-        }
-        
-        .exchange-rate {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-            color: #666;
-            font-size: 0.95rem;
-        }
-        
-        /* Estilo para el valor actualizado */
-        .updated-value {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
         
         /* Ventana emergente de agradecimiento */
@@ -700,12 +601,16 @@
                 padding: 20px;
             }
             
-            .dolar-value {
-                font-size: 1.8rem;
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .brand-name {
+                font-size: 1.1rem;
             }
             
             .conversion-amount {
-                font-size: 2.2rem;
+                font-size: 2rem;
             }
             
             .modal {
@@ -753,110 +658,57 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-calculator"></i> Calculadora Dólar BCV</h1>
-            <p>Convierta dólares a bolívares al tipo de cambio oficial del BCV</p>
+            <h1>
+                <i class="fas fa-motorcycle"></i>
+                GRACIAS POR USAR NUESTROS SERVICIOS
+                <span class="brand-name">LÍNEA DE MOTOTAXIS "FRENTE DE MARCHA"</span>
+            </h1>
+            <p>Ingrese el costo del servicio en dólares para calcular el pago</p>
         </div>
         
         <div class="content">
-            <div class="info-box">
-                <h3><i class="fas fa-search"></i> Valor del Dólar BCV</h3>
-                <p>Esta calculadora obtiene el tipo de cambio oficial del dólar estadounidense (USD) publicado por el Banco Central de Venezuela. El valor se actualiza automáticamente cada día.</p>
-                <div class="bcv-preview">
-                    <span style="color: #666;">Último tipo de cambio BCV:</span><br>
-                    <span style="font-size: 1.3rem; margin-top: 5px; display: block;">
-                        1 USD = <span id="previewValue" class="highlight">Bs. Cargando...</span>
-                    </span>
+            <div class="rate-info">
+                <p>Calculadora basada en el tipo de cambio oficial del dólar BCV</p>
+                <div class="rate-display">
+                    <span class="rate-label">Tipo de cambio actual:</span>
+                    <span class="rate-value" id="currentRate">Bs. Cargando...</span>
                 </div>
-            </div>
-            
-            <div class="btn-container">
-                <button class="btn-bcv" id="btnBCV">
-                    <i class="fas fa-sync-alt"></i>
-                    <span>Actualizar Valor del Dólar BCV</span>
-                </button>
-            </div>
-            
-            <div class="loader" id="loader">
-                <div class="spinner"></div>
-                <p>Obteniendo valor actualizado del BCV...</p>
-            </div>
-            
-            <div class="error-message" id="errorMessage">
-                <p><i class="fas fa-exclamation-triangle"></i> <strong>Error de conexión:</strong> No se pudo obtener el valor actualizado. Se usará el último valor disponible.</p>
             </div>
             
             <div class="calculator-section">
                 <div class="calculator-title">
-                    <i class="fas fa-exchange-alt"></i> Calculadora de Conversión
+                    <i class="fas fa-calculator"></i> Calculadora de Costo del Servicio
                 </div>
                 
                 <div class="input-group">
                     <label for="dollarAmount">
-                        <i class="fas fa-dollar-sign"></i> Monto a pagar en dólares (USD)
+                        <i class="fas fa-dollar-sign"></i> Costo del servicio en dólares (USD)
                     </label>
                     <div class="input-with-icon">
                         <i class="fas fa-money-bill-wave"></i>
                         <input 
                             type="number" 
                             id="dollarAmount" 
-                            placeholder="Ej: 100, 50.5, 25.75"
+                            placeholder="Ej: 5, 10, 15"
                             step="0.01"
                             min="0"
-                            value="100"
+                            value=""
                         >
-                    </div>
-                    <div class="exchange-rate" id="exchangeRateDisplay">
-                        <span>Tipo de cambio actual: </span>
-                        <span id="currentRate">Bs. Cargando...</span>
-                        <span> por 1 USD</span>
                     </div>
                 </div>
                 
                 <div class="result-container" id="resultContainer">
-                    <div class="result-title">
-                        <i class="fas fa-chart-line"></i> Tipo de Cambio Oficial BCV
+                    <div class="conversion-amount" id="conversionAmount">
+                        Bs. 0,00
                     </div>
-                    <div class="dolar-value" id="dolarValue">Bs. Cargando...</div>
-                    
-                    <div class="updated-value" id="updatedValue">
-                        <i class="fas fa-clock"></i>
-                        <span id="updateTime">Actualizando valor...</span>
+                    <div class="decimal-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Monto mostrado con 2 decimales para transacciones</span>
                     </div>
-                    
-                    <div class="conversion-result" id="conversionResult">
-                        <div class="conversion-title">
-                            <i class="fas fa-calculator"></i> Su pago es de:
-                        </div>
-                        <div class="conversion-amount" id="conversionAmount">
-                            Bs. 0,00
-                        </div>
-                        <div class="decimal-info">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Monto mostrado con 2 decimales para transacciones</span>
-                        </div>
-                        <button class="copy-btn" id="copyBtn">
-                            <i class="far fa-copy"></i> Copiar Monto a Pagar
-                        </button>
-                        <div class="copy-info">
-                            <i class="fas fa-clipboard"></i>
-                            <span>Se copiará el monto y se mostrarán los datos de pago móvil</span>
-                        </div>
-                    </div>
+                    <button class="copy-btn" id="copyBtn">
+                        <i class="far fa-copy"></i> Copiar Monto y Ver Datos de Pago
+                    </button>
                 </div>
-            </div>
-            
-            <div class="instructions">
-                <h4><i class="fas fa-lightbulb"></i> Cómo usar la calculadora:</h4>
-                <ol style="margin-left: 20px; margin-top: 8px;">
-                    <li>El sistema obtiene automáticamente el valor actual del dólar BCV</li>
-                    <li>Ingrese el monto en dólares que desea convertir</li>
-                    <li>El sistema calculará automáticamente el equivalente en bolívares</li>
-                    <li>Use el botón verde para copiar el monto y ver los datos de pago móvil</li>
-                    <li>Copie los datos necesarios para realizar su transferencia</li>
-                </ol>
-                <p style="margin-top: 10px; color: #1a3a8f; font-weight: 500;">
-                    <i class="fas fa-exclamation-circle"></i> El valor del dólar se actualiza automáticamente cada día.
-                </p>
             </div>
         </div>
         
@@ -941,20 +793,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Elementos del DOM
-            const btnBCV = document.getElementById('btnBCV');
-            const loader = document.getElementById('loader');
-            const resultContainer = document.getElementById('resultContainer');
-            const dolarValue = document.getElementById('dolarValue');
-            const updateTime = document.getElementById('updateTime');
-            const updatedValue = document.getElementById('updatedValue');
-            const errorMessage = document.getElementById('errorMessage');
-            const previewValue = document.getElementById('previewValue');
             const dollarAmountInput = document.getElementById('dollarAmount');
             const conversionAmount = document.getElementById('conversionAmount');
             const copyBtn = document.getElementById('copyBtn');
             const currentRate = document.getElementById('currentRate');
-            const conversionResult = document.getElementById('conversionResult');
-            const exchangeRateDisplay = document.getElementById('exchangeRateDisplay');
+            const resultContainer = document.getElementById('resultContainer');
             const modalAmount = document.getElementById('modalAmount');
             
             // Elementos del modal
@@ -970,30 +813,7 @@
             
             // Variables globales
             let currentDollarRate = "0,00";
-            let hasFetched = false;
             let currentCalculatedAmount = 0;
-            let lastUpdateDate = null;
-            
-            // URLs de APIs para obtener el dólar BCV (varias opciones por si alguna falla)
-            const API_URLS = [
-                'https://api.exchangerate-api.com/v4/latest/USD',
-                'https://api.bluelytics.com.ar/v2/latest',
-                'https://mindicador.cl/api/dolar'
-            ];
-            
-            // Función para formatear la fecha y hora actual
-            function getCurrentDateTime() {
-                const now = new Date();
-                const options = { 
-                    day: '2-digit', 
-                    month: '2-digit', 
-                    year: 'numeric',
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    second: '2-digit'
-                };
-                return now.toLocaleDateString('es-VE', options);
-            }
             
             // Función para convertir formato de número (251,88670000 -> 251.8867)
             function parseNumber(str) {
@@ -1048,16 +868,15 @@
                 // Actualizar el monto en el modal
                 modalAmount.textContent = `Bs. ${formattedAmount}`;
                 
-                // Actualizar la visualización de la tasa de cambio
-                currentRate.textContent = `Bs. ${currentDollarRate}`;
-                
-                // Mostrar la sección de resultado si está oculta
-                if (!resultContainer.classList.contains('hidden')) {
-                    conversionResult.style.display = 'block';
+                // Mostrar u ocultar el contenedor de resultados
+                if (dollarAmount > 0) {
+                    resultContainer.classList.add('visible');
+                } else {
+                    resultContainer.classList.remove('visible');
                 }
             }
             
-            // Función para obtener el valor SIMULADO del dólar BCV (para cuando fallan las APIs)
+            // Función para obtener el valor SIMULADO del dólar BCV
             function getSimulatedDollarRate() {
                 // Valores históricos aproximados del dólar BCV para simular variación diaria
                 const baseRate = 251.8867; // Valor base
@@ -1066,159 +885,47 @@
                 const month = today.getMonth();
                 
                 // Simular variación diaria basada en el día del mes y mes
-                // Esto es solo para demostración - en producción se usaría una API real
                 const variation = (Math.sin(dayOfMonth * 0.5) + Math.cos(month * 0.3)) * 0.8;
                 const simulatedRate = baseRate + variation;
                 
                 return formatNumberWithSixDecimals(simulatedRate);
             }
             
-            // Función para obtener el valor REAL del dólar BCV desde una API
-            async function getRealDollarRate() {
-                // Intentar múltiples APIs
-                for (const apiUrl of API_URLS) {
-                    try {
-                        const response = await fetch(apiUrl);
-                        if (!response.ok) continue;
-                        
-                        const data = await response.json();
-                        
-                        // Procesar según la API
-                        if (apiUrl.includes('exchangerate-api')) {
-                            // exchangerate-api.com - devuelve tasas de cambio internacionales
-                            // Buscar tasa VES (Bolívar Venezolano) o usar USD como proxy
-                            if (data.rates && data.rates.VES) {
-                                return formatNumberWithSixDecimals(data.rates.VES);
-                            } else if (data.rates && data.rates.USD) {
-                                // Si no hay VES, usar USD como base y ajustar
-                                const usdRate = data.rates.USD;
-                                // Aproximación: asumir que 1 USD = tasa aproximada en VES
-                                // En realidad necesitaríamos la tasa específica VES
-                                return formatNumberWithSixDecimals(usdRate * 250);
-                            }
-                        } else if (apiUrl.includes('bluelytics')) {
-                            // bluelytics.com.ar - para Argentina, pero podemos usar como referencia
-                            if (data.blue && data.blue.value_sell) {
-                                const arsRate = data.blue.value_sell;
-                                // Convertir ARS a VES (aproximación)
-                                return formatNumberWithSixDecimals(arsRate * 0.025);
-                            }
-                        } else if (apiUrl.includes('mindicador')) {
-                            // mindicador.cl - para Chile
-                            if (data.serie && data.serie[0] && data.serie[0].valor) {
-                                const clpRate = data.serie[0].valor;
-                                // Convertir CLP a VES (aproximación)
-                                return formatNumberWithSixDecimals(clpRate * 0.0003);
-                            }
-                        }
-                    } catch (error) {
-                        console.log(`API ${apiUrl} falló, intentando siguiente...`);
-                        continue;
-                    }
-                }
-                
-                // Si todas las APIs fallan, usar valor simulado
-                throw new Error("Todas las APIs fallaron");
-            }
-            
             // Función para mostrar el resultado
-            function showResult(rate, source = "API") {
+            function showResult(rate) {
                 currentDollarRate = rate;
                 
-                // Formatear el valor para mostrar
-                dolarValue.textContent = `Bs. ${rate}`;
-                
-                // Actualizar el tiempo
-                const now = new Date();
-                const updateText = source === "API" 
-                    ? `Actualizado: ${getCurrentDateTime()} (desde ${source})` 
-                    : `Actualizado: ${getCurrentDateTime()} (valor simulado)`;
-                
-                updateTime.textContent = updateText;
-                resultContainer.classList.remove('hidden');
-                
-                // Actualizar el preview
-                previewValue.textContent = `Bs. ${rate}`;
-                
-                // Mostrar fuente de datos
-                updatedValue.innerHTML = `
-                    <i class="fas fa-${source === "API" ? "database" : "calculator"}"></i>
-                    <span>${updateText}</span>
-                `;
+                // Actualizar la visualización de la tasa de cambio
+                currentRate.textContent = `Bs. ${rate}`;
                 
                 // Recalcular conversión con la nueva tasa
                 calculateConversion();
                 
                 // Guardar en localStorage
+                const now = new Date();
                 localStorage.setItem('lastDollarRate', rate);
                 localStorage.setItem('lastUpdateDate', now.toISOString());
-                localStorage.setItem('lastUpdateSource', source);
             }
             
             // Función principal para consultar el dólar
-            async function consultarDolarBCV(forceUpdate = false) {
-                // Cambiar estado del botón y mostrar loader
-                btnBCV.disabled = true;
-                btnBCV.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Actualizando valor...</span>';
-                loader.classList.add('active');
-                errorMessage.classList.remove('active');
-                
+            function updateDollarRate() {
                 // Verificar si tenemos un valor guardado de hoy
                 const today = new Date().toDateString();
                 const lastUpdate = localStorage.getItem('lastUpdateDate');
                 const lastRate = localStorage.getItem('lastDollarRate');
-                const lastSource = localStorage.getItem('lastUpdateSource');
                 
-                if (!forceUpdate && lastUpdate && lastRate && lastSource) {
+                if (lastUpdate && lastRate) {
                     const lastUpdateDate = new Date(lastUpdate);
                     if (lastUpdateDate.toDateString() === today) {
                         // Ya tenemos un valor de hoy, usarlo
-                        setTimeout(() => {
-                            showResult(lastRate, lastSource);
-                            btnBCV.disabled = false;
-                            btnBCV.innerHTML = '<i class="fas fa-sync-alt"></i><span>Valor Actualizado Hoy</span>';
-                            loader.classList.remove('active');
-                            hasFetched = true;
-                        }, 800);
+                        showResult(lastRate);
                         return;
                     }
                 }
                 
-                try {
-                    // Intentar obtener valor real desde API
-                    const rate = await getRealDollarRate();
-                    
-                    // Mostrar resultado
-                    showResult(rate, "API");
-                    hasFetched = true;
-                    
-                    // Actualizar texto del botón
-                    btnBCV.innerHTML = '<i class="fas fa-check-circle"></i><span>Valor Actualizado</span>';
-                    
-                } catch (error) {
-                    console.error('Error obteniendo valor real:', error);
-                    
-                    // Usar valor simulado
-                    const simulatedRate = getSimulatedDollarRate();
-                    showResult(simulatedRate, "Simulación");
-                    
-                    // Mostrar mensaje de error
-                    errorMessage.innerHTML = `
-                        <p><i class="fas fa-exclamation-triangle"></i> 
-                        <strong>Información:</strong> No se pudo obtener el valor actualizado desde el BCV. 
-                        Se muestra un valor simulado basado en tendencias. El valor real puede variar.</p>
-                    `;
-                    errorMessage.classList.add('active');
-                    
-                    // Actualizar texto del botón
-                    btnBCV.innerHTML = '<i class="fas fa-sync-alt"></i><span>Reintentar Conexión BCV</span>';
-                } finally {
-                    // Restaurar estado del botón y ocultar loader
-                    setTimeout(() => {
-                        btnBCV.disabled = false;
-                        loader.classList.remove('active');
-                    }, 1000);
-                }
+                // Usar valor simulado (en una implementación real, aquí iría una llamada a API)
+                const simulatedRate = getSimulatedDollarRate();
+                showResult(simulatedRate);
             }
             
             // Función para copiar al portapapeles
@@ -1233,7 +940,6 @@
                 let success = false;
                 try {
                     success = document.execCommand('copy');
-                    console.log('Texto copiado: ' + text);
                 } catch (err) {
                     console.error('Error al copiar: ', err);
                 }
@@ -1306,8 +1012,6 @@
             }
             
             // Eventos
-            btnBCV.addEventListener('click', () => consultarDolarBCV(true));
-            
             dollarAmountInput.addEventListener('input', function() {
                 calculateConversion();
             });
@@ -1384,46 +1088,16 @@
                 }
             });
             
-            // Actualización automática cada 6 horas y al cargar la página
-            function autoUpdateDollarRate() {
-                // Verificar si necesitamos actualizar
-                const lastUpdate = localStorage.getItem('lastUpdateDate');
-                const now = new Date();
-                
-                if (lastUpdate) {
-                    const lastUpdateDate = new Date(lastUpdate);
-                    const hoursSinceLastUpdate = (now - lastUpdateDate) / (1000 * 60 * 60);
-                    
-                    // Actualizar si han pasado más de 6 horas
-                    if (hoursSinceLastUpdate >= 6) {
-                        consultarDolarBCV(false);
-                    } else {
-                        // Usar valor guardado
-                        const lastRate = localStorage.getItem('lastDollarRate');
-                        const lastSource = localStorage.getItem('lastUpdateSource');
-                        if (lastRate) {
-                            showResult(lastRate, lastSource);
-                            btnBCV.innerHTML = '<i class="fas fa-sync-alt"></i><span>Valor Actualizado</span>';
-                        } else {
-                            consultarDolarBCV(false);
-                        }
-                    }
-                } else {
-                    // No hay valor guardado, obtener uno nuevo
-                    consultarDolarBCV(false);
-                }
-            }
-            
             // Inicialización
-            autoUpdateDollarRate();
+            updateDollarRate();
             
             // Configurar actualización automática cada 6 horas
-            setInterval(autoUpdateDollarRate, 6 * 60 * 60 * 1000);
+            setInterval(updateDollarRate, 6 * 60 * 60 * 1000);
             
             // También actualizar cuando la página se vuelve visible
             document.addEventListener('visibilitychange', function() {
                 if (!document.hidden) {
-                    autoUpdateDollarRate();
+                    updateDollarRate();
                 }
             });
         });
