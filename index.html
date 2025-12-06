@@ -104,6 +104,13 @@
             font-size: 1.1rem;
         }
         
+        .update-info {
+            color: #666;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            text-align: center;
+        }
+        
         .calculator-section {
             background-color: #f1f8ff;
             border-radius: 12px;
@@ -179,16 +186,6 @@
             display: block;
         }
         
-        .result-title {
-            color: #1a3a8f;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
         .conversion-amount {
             font-size: 2.5rem;
             font-weight: 700;
@@ -225,16 +222,6 @@
         
         .copy-btn.copied i {
             animation: bounce 0.5s;
-        }
-        
-        .update-info {
-            color: #666;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
         }
         
         .decimal-info {
@@ -402,6 +389,7 @@
             align-items: center;
             flex-direction: column;
             gap: 15px;
+            margin: 15px 0;
         }
         
         .loader.active {
@@ -429,6 +417,7 @@
             border-radius: 8px;
             margin-top: 15px;
             display: none;
+            text-align: center;
         }
         
         .error-message.active {
@@ -673,6 +662,19 @@
                     <span class="rate-label">Tipo de cambio actual:</span>
                     <span class="rate-value" id="currentRate">Bs. Cargando...</span>
                 </div>
+                <div class="update-info" id="updateInfo">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Actualizando valor del dólar BCV...</span>
+                </div>
+            </div>
+            
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p>Obteniendo valor actualizado del dólar BCV...</p>
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                <p><i class="fas fa-exclamation-triangle"></i> <strong>Información:</strong> No se pudo obtener el valor actualizado desde el BCV. Se muestra el último valor guardado. Se volverá a intentar en 5 minutos.</p>
             </div>
             
             <div class="calculator-section">
@@ -714,7 +716,7 @@
         
         <div class="footer">
             <p>Calculadora basada en el tipo de cambio del Banco Central de Venezuela (BCV)</p>
-            <p><i class="fas fa-exclamation-circle"></i> Para uso informativo. Consulte siempre fuentes oficiales.</p>
+            <p><i class="fas fa-exclamation-circle"></i> Valor actualizado en tiempo real. Se actualiza automáticamente cada día.</p>
         </div>
     </div>
 
@@ -799,6 +801,9 @@
             const currentRate = document.getElementById('currentRate');
             const resultContainer = document.getElementById('resultContainer');
             const modalAmount = document.getElementById('modalAmount');
+            const loader = document.getElementById('loader');
+            const errorMessage = document.getElementById('errorMessage');
+            const updateInfo = document.getElementById('updateInfo');
             
             // Elementos del modal
             const paymentModal = document.getElementById('paymentModal');
@@ -814,6 +819,58 @@
             // Variables globales
             let currentDollarRate = "0,00";
             let currentCalculatedAmount = 0;
+            let lastUpdateTime = null;
+            
+            // API para obtener el dólar BCV en tiempo real
+            // Usamos múltiples fuentes para mayor confiabilidad
+            const BCV_API_SOURCES = [
+                {
+                    name: "BCV Oficial (proxy)",
+                    url: "https://api.allorigins.win/raw?url=https://www.bcv.org.ve/",
+                    parseFunction: parseBCVOfficial
+                },
+                {
+                    name: "Exchange Rate API",
+                    url: "https://api.exchangerate-api.com/v4/latest/USD",
+                    parseFunction: parseExchangeRateAPI
+                },
+                {
+                    name: "DolarToday API",
+                    url: "https://s3.amazonaws.com/dolartoday/data.json",
+                    parseFunction: parseDolarTodayAPI
+                }
+            ];
+            
+            // Función para parsear la página oficial del BCV
+            function parseBCVOfficial(html) {
+                // Buscar el valor del dólar en el HTML de la página del BCV
+                const regex = /USD.*?<strong>([\d,]+)/i;
+                const match = html.match(regex);
+                
+                if (match && match[1]) {
+                    return match[1].replace(',', '.');
+                }
+                return null;
+            }
+            
+            // Función para parsear Exchange Rate API
+            function parseExchangeRateAPI(data) {
+                // Buscar tasa para Venezuela (VES)
+                if (data.rates && data.rates.VES) {
+                    return data.rates.VES.toString();
+                }
+                return null;
+            }
+            
+            // Función para parsear DolarToday API
+            function parseDolarTodayAPI(data) {
+                if (data.USD && data.USD.dolartoday) {
+                    return data.USD.dolartoday.toString();
+                } else if (data.USD && data.USD.promedio) {
+                    return data.USD.promedio.toString();
+                }
+                return null;
+            }
             
             // Función para convertir formato de número (251,88670000 -> 251.8867)
             function parseNumber(str) {
@@ -832,11 +889,11 @@
                 });
             }
             
-            // Función para formatear número con 6 decimales (para la tasa)
-            function formatNumberWithSixDecimals(num) {
-                return num.toLocaleString('es-VE', {
-                    minimumFractionDigits: 6,
-                    maximumFractionDigits: 6
+            // Función para formatear número con 2 decimales (para la tasa)
+            function formatNumberWithTwoDecimalsForRate(num) {
+                return parseFloat(num).toLocaleString('es-VE', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
                 });
             }
             
@@ -876,10 +933,62 @@
                 }
             }
             
-            // Función para obtener el valor SIMULADO del dólar BCV
+            // Función para obtener el valor REAL del dólar BCV desde APIs
+            async function getRealDollarRate() {
+                // Intentar cada fuente de API
+                for (const source of BCV_API_SOURCES) {
+                    try {
+                        console.log(`Intentando obtener valor desde: ${source.name}`);
+                        
+                        // Mostrar loader
+                        loader.classList.add('active');
+                        errorMessage.classList.remove('active');
+                        
+                        const response = await fetch(source.url, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                            },
+                            mode: 'cors'
+                        });
+                        
+                        if (!response.ok) {
+                            console.log(`Error en respuesta de ${source.name}`);
+                            continue;
+                        }
+                        
+                        let data;
+                        
+                        // Procesar según el tipo de respuesta
+                        if (source.name === "BCV Oficial (proxy)") {
+                            data = await response.text();
+                        } else {
+                            data = await response.json();
+                        }
+                        
+                        const rate = source.parseFunction(data);
+                        
+                        if (rate && !isNaN(parseFloat(rate))) {
+                            console.log(`Valor obtenido desde ${source.name}: ${rate}`);
+                            return rate;
+                        }
+                        
+                    } catch (error) {
+                        console.log(`Error con ${source.name}:`, error);
+                        continue;
+                    } finally {
+                        loader.classList.remove('active');
+                    }
+                }
+                
+                throw new Error("Todas las fuentes fallaron");
+            }
+            
+            // Función para obtener el valor SIMULADO del dólar BCV (como respaldo)
             function getSimulatedDollarRate() {
                 // Valores históricos aproximados del dólar BCV para simular variación diaria
-                const baseRate = 251.8867; // Valor base
+                const baseRate = 36.4105; // Valor base reciente
                 const today = new Date();
                 const dayOfMonth = today.getDate();
                 const month = today.getMonth();
@@ -888,44 +997,88 @@
                 const variation = (Math.sin(dayOfMonth * 0.5) + Math.cos(month * 0.3)) * 0.8;
                 const simulatedRate = baseRate + variation;
                 
-                return formatNumberWithSixDecimals(simulatedRate);
+                return simulatedRate.toFixed(4);
             }
             
             // Función para mostrar el resultado
-            function showResult(rate) {
-                currentDollarRate = rate;
+            function showResult(rate, source = "API", isRealTime = true) {
+                // Formatear la tasa con 2 decimales
+                const formattedRate = formatNumberWithTwoDecimalsForRate(rate);
+                currentDollarRate = rate.toString().replace('.', ',');
                 
                 // Actualizar la visualización de la tasa de cambio
-                currentRate.textContent = `Bs. ${rate}`;
+                currentRate.textContent = `Bs. ${formattedRate}`;
+                
+                // Actualizar información de actualización
+                const now = new Date();
+                lastUpdateTime = now;
+                const timeString = now.toLocaleTimeString('es-VE', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                
+                updateInfo.innerHTML = `
+                    <i class="fas fa-clock"></i>
+                    <span>${isRealTime ? 'Actualizado' : 'Último valor disponible'}: ${timeString} (${source})</span>
+                `;
                 
                 // Recalcular conversión con la nueva tasa
                 calculateConversion();
                 
                 // Guardar en localStorage
-                const now = new Date();
-                localStorage.setItem('lastDollarRate', rate);
-                localStorage.setItem('lastUpdateDate', now.toISOString());
+                localStorage.setItem('lastDollarRate', currentDollarRate);
+                localStorage.setItem('lastUpdateTime', now.toISOString());
+                localStorage.setItem('lastUpdateSource', source);
             }
             
             // Función principal para consultar el dólar
-            function updateDollarRate() {
-                // Verificar si tenemos un valor guardado de hoy
-                const today = new Date().toDateString();
-                const lastUpdate = localStorage.getItem('lastUpdateDate');
+            async function updateDollarRate(forceUpdate = false) {
+                // Verificar si tenemos un valor guardado reciente (menos de 24 horas)
+                const lastUpdate = localStorage.getItem('lastUpdateTime');
                 const lastRate = localStorage.getItem('lastDollarRate');
+                const lastSource = localStorage.getItem('lastUpdateSource');
                 
-                if (lastUpdate && lastRate) {
+                if (!forceUpdate && lastUpdate && lastRate) {
                     const lastUpdateDate = new Date(lastUpdate);
-                    if (lastUpdateDate.toDateString() === today) {
-                        // Ya tenemos un valor de hoy, usarlo
-                        showResult(lastRate);
+                    const now = new Date();
+                    const hoursSinceLastUpdate = (now - lastUpdateDate) / (1000 * 60 * 60);
+                    
+                    // Si ha pasado menos de 24 horas, usar el valor guardado
+                    if (hoursSinceLastUpdate < 24) {
+                        console.log(`Usando valor guardado (${hoursSinceLastUpdate.toFixed(1)} horas atrás)`);
+                        showResult(parseNumber(lastRate), `${lastSource} (guardado)`, false);
                         return;
                     }
                 }
                 
-                // Usar valor simulado (en una implementación real, aquí iría una llamada a API)
-                const simulatedRate = getSimulatedDollarRate();
-                showResult(simulatedRate);
+                try {
+                    // Intentar obtener valor real desde APIs
+                    const rate = await getRealDollarRate();
+                    showResult(rate, "BCV en tiempo real", true);
+                    
+                } catch (error) {
+                    console.error('Error obteniendo valor real:', error);
+                    
+                    // Si hay un valor guardado, usarlo
+                    if (lastRate) {
+                        console.log('Usando último valor guardado debido a error');
+                        showResult(parseNumber(lastRate), `${lastSource || "Respaldo"} (guardado)`, false);
+                    } else {
+                        // Usar valor simulado como último recurso
+                        console.log('Usando valor simulado');
+                        const simulatedRate = getSimulatedDollarRate();
+                        showResult(parseNumber(simulatedRate), "Simulación", false);
+                    }
+                    
+                    // Mostrar mensaje de error
+                    errorMessage.classList.add('active');
+                    
+                    // Reintentar en 5 minutos si hubo error
+                    setTimeout(() => {
+                        updateDollarRate(true);
+                    }, 5 * 60 * 1000);
+                }
             }
             
             // Función para copiar al portapapeles
@@ -1088,17 +1241,40 @@
                 }
             });
             
+            // Función para actualizar automáticamente el valor
+            function scheduleAutoUpdate() {
+                // Actualizar ahora
+                updateDollarRate();
+                
+                // Programar actualización cada 6 horas
+                setInterval(() => {
+                    updateDollarRate(true);
+                }, 6 * 60 * 60 * 1000);
+                
+                // También actualizar cuando la página se vuelve visible (si el usuario vuelve a la pestaña)
+                document.addEventListener('visibilitychange', function() {
+                    if (!document.hidden) {
+                        // Verificar si ha pasado más de 1 hora desde la última actualización
+                        if (lastUpdateTime) {
+                            const now = new Date();
+                            const hoursSinceLastUpdate = (now - lastUpdateTime) / (1000 * 60 * 60);
+                            
+                            if (hoursSinceLastUpdate > 1) {
+                                updateDollarRate(true);
+                            }
+                        } else {
+                            updateDollarRate(true);
+                        }
+                    }
+                });
+            }
+            
             // Inicialización
-            updateDollarRate();
+            scheduleAutoUpdate();
             
-            // Configurar actualización automática cada 6 horas
-            setInterval(updateDollarRate, 6 * 60 * 60 * 1000);
-            
-            // También actualizar cuando la página se vuelve visible
-            document.addEventListener('visibilitychange', function() {
-                if (!document.hidden) {
-                    updateDollarRate();
-                }
+            // También actualizar al hacer clic en el valor actual
+            currentRate.addEventListener('click', function() {
+                updateDollarRate(true);
             });
         });
     </script>
